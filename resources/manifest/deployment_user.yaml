@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+  namespace: "$(NAMESPACE)"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+    spec:
+      serviceAccountName: user
+      nodeSelector:
+        eks.amazonaws.com/nodegroup: "$(NODEGROUP_NAME)"
+      containers:
+      - name: user
+        image: "$(IMAGE_USER)"
+        ports:
+        - containerPort: 8080
+        env:
+        - name: TOKEN_ENDPOINT
+          value: "http://token.$(NAMESPACE):8080"
+        - name: MONGODB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: user-config
+              key: MONGODB_HOST
+        - name: MONGODB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: user-config
+              key: MONGODB_PORT
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: user-config
+              key: AWS_REGION
+        - name: AWS_SECRET_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: user-config
+              key: AWS_SECRET_NAME
+        - name: MONGODB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: user-secret
+              key: MONGODB_USERNAME
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: user-secret
+              key: MONGODB_PASSWORD
+        resources:
+          requests:
+            cpu: "500m"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
