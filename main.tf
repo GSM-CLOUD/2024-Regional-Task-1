@@ -113,15 +113,6 @@ module "lb_controller" {
   depends_on = [ module.secrets_manager ]
 }
 
-module "nginx_ingress_controller" {
-  source = "./Ingress_nginx_controller"
-  prefix = var.prefix
-  eks_oidc_provider_arn = module.eks.oidc_provider_arn
-  nlb_sg_id = module.lb_controller.nlb_sg_id
-
-  depends_on = [ module.lb_controller ]
-}
-
 module "resources" {
   source = "./resources"
   prefix = var.prefix
@@ -144,5 +135,5 @@ module "resources" {
   service_name = var.service_name
   alb_name = var.alb_name
 
-  depends_on = [ module.nginx_ingress_controller ]
+  depends_on = [ module.lb_controller ]
 }
