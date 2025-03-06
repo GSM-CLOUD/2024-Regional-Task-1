@@ -5,7 +5,7 @@ module "user-app-irsa-role" {
   oidc_providers = {
     ex = {
       provider_arn               = var.eks_oidc_provider_arn
-      namespace_service_accounts = ["${var.prefix}:user"]
+      namespace_service_accounts = ["skills:user"]
     }
   }
 }
@@ -48,7 +48,7 @@ module "cluster-autoscaler-irsa-role" {
   oidc_providers = {
     ex = {
       provider_arn               = var.eks_oidc_provider_arn
-      namespace_service_accounts = ["${var.prefix}:cluster-autoscaler"]
+      namespace_service_accounts = ["kube-system:cluster-autoscaler"]
     }
   }
 }
