@@ -81,7 +81,7 @@ resource "kubernetes_manifest" "user_config" {
 resource "kubernetes_service_account" "sa_user" {
   
   metadata {
-    name = var.service_account_name
+    name = "user"
     namespace = var.namespace
     annotations = {
       "eks.amazonaws.com/role-arn" = module.user-app-irsa-role.iam_role_arn
