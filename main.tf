@@ -131,7 +131,6 @@ module "resources" {
   app_nodegroup_name = module.eks.app_nodegroup_name
   account_id = data.aws_caller_identity.current.account_id
   secrets_manager_arn = module.secrets_manager.secrets_manager_arn
-  service_account_name = var.service_account_name
   service_name = var.service_name
   alb_name = var.alb_name
 

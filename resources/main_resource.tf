@@ -81,7 +81,7 @@ resource "kubernetes_manifest" "user_config" {
 resource "kubernetes_service_account" "sa_user" {
   
   metadata {
-    name = var.service_account_name
+    name = "user"
     namespace = var.namespace
     annotations = {
       "eks.amazonaws.com/role-arn" = module.user-app-irsa-role.iam_role_arn
@@ -103,16 +103,68 @@ resource "kubernetes_manifest" "deploy_user" {
         replace(
           replace( 
             replace(
-              file(
+                file(
           "${path.module}/manifest/${each.value}"), 
           "$(NAMESPACE)", var.namespace),
           "$(NODEGROUP_NAME)", split(":", var.app_nodegroup_name)[1]), 
           "$(IMAGE_USER)", var.ecr_user_uri),
           "$(ALB_NAME)", var.alb_name),
-          "$(SERVICE_NAME)", var.service_name)
+          "$(SERVICE_NAME)", var.service_name),
   )
 
   depends_on = [
     kubernetes_service_account.sa_user
+  ]
+}
+
+resource "kubernetes_manifest" "deploy_cluster_autoscaler_sa" {
+  for_each = fileset("${path.module}/manifest", "cluster-autoscaler-sa.yaml")
+
+  manifest = yamldecode(
+    replace(
+      file("${path.module}/manifest/${each.value}"),
+      "$(CLUSTER_AUTOSCALER_ROLE_ARN)", module.cluster-autoscaler-irsa-role.iam_role_arn
+    )
+  )
+
+  depends_on = [
+    kubernetes_manifest.deploy_user,
+    module.cluster-autoscaler-irsa-role
+  ]
+}
+
+resource "kubernetes_manifest" "deploy_cluster_autoscaler_role" {
+  for_each = fileset("${path.module}/manifest", "cluster-autoscaler-role-*.yaml")
+
+  manifest = yamldecode(
+    file("${path.module}/manifest/${each.value}")
+  )
+
+  depends_on = [
+    kubernetes_manifest.deploy_cluster_autoscaler_sa
+  ]
+}
+
+resource "kubernetes_manifest" "deploy_cluster_autoscaler_rolebinding" {
+  for_each = fileset("${path.module}/manifest", "cluster-autoscaler-rb-*.yaml")
+
+  manifest = yamldecode(
+    file("${path.module}/manifest/${each.value}")
+  )
+
+  depends_on = [
+    kubernetes_manifest.deploy_cluster_autoscaler_role
+  ]
+}
+
+resource "kubernetes_manifest" "deploy_cluster_autoscaler_deployment" {
+  for_each = fileset("${path.module}/manifest", "cluster-autoscaler-dp-*.yaml")
+
+  manifest = yamldecode(
+    file("${path.module}/manifest/${each.value}")
+  )
+
+  depends_on = [
+    kubernetes_manifest.deploy_cluster_autoscaler_rolebinding
   ]
 }

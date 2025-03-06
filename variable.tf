@@ -35,7 +35,3 @@ variable "service_name" {
 variable "alb_name" {
   default = "skills-user-alb"
 }
-
-variable "service_account_name" {
-  default = "user"
-}

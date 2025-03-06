@@ -30,8 +30,6 @@ variable "account_id" {}
 
 variable "secrets_manager_arn" {}
 
-variable "service_account_name" {}
-
 variable "service_name" {}
 
 variable "alb_name" {}
