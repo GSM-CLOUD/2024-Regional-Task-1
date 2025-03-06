@@ -116,3 +116,55 @@ resource "kubernetes_manifest" "deploy_user" {
     kubernetes_service_account.sa_user
   ]
 }
+
+resource "kubernetes_manifest" "deploy_cluster_autoscaler_sa" {
+  for_each = fileset("${path.module}/manifest", "cluster-autoscaler-sa.yaml")
+
+  manifest = yamldecode(
+    replace(
+      file("${path.module}/manifest/${each.value}"),
+      "$(CLUSTER_AUTOSCALER_ROLE_ARN)", module.cluster-autoscaler-irsa-role.iam_role_arn
+    )
+  )
+
+  depends_on = [
+    kubernetes_manifest.deploy_user,
+    module.cluster-autoscaler-irsa-role
+  ]
+}
+
+resource "kubernetes_manifest" "deploy_cluster_autoscaler_role" {
+  for_each = fileset("${path.module}/manifest", "cluster-autoscaler-role-*.yaml")
+
+  manifest = yamldecode(
+    file("${path.module}/manifest/${each.value}")
+  )
+
+  depends_on = [
+    kubernetes_manifest.deploy_cluster_autoscaler_sa
+  ]
+}
+
+resource "kubernetes_manifest" "deploy_cluster_autoscaler_rolebinding" {
+  for_each = fileset("${path.module}/manifest", "cluster-autoscaler-rb-*.yaml")
+
+  manifest = yamldecode(
+    file("${path.module}/manifest/${each.value}")
+  )
+
+  depends_on = [
+    kubernetes_manifest.deploy_cluster_autoscaler_role
+  ]
+}
+
+resource "kubernetes_manifest" "deploy_cluster_autoscaler_deployment" {
+  for_each = fileset("${path.module}/manifest", "cluster-autoscaler-dp-*.yaml")
+
+  manifest = yamldecode(
+    file("${path.module}/manifest/${each.value}")
+  )
+
+  depends_on = [
+    kubernetes_manifest.deploy_cluster_autoscaler_rolebinding
+  ]
+}
