@@ -103,13 +103,13 @@ resource "kubernetes_manifest" "deploy_user" {
         replace(
           replace( 
             replace(
-              file(
+                file(
           "${path.module}/manifest/${each.value}"), 
           "$(NAMESPACE)", var.namespace),
           "$(NODEGROUP_NAME)", split(":", var.app_nodegroup_name)[1]), 
           "$(IMAGE_USER)", var.ecr_user_uri),
           "$(ALB_NAME)", var.alb_name),
-          "$(SERVICE_NAME)", var.service_name)
+          "$(SERVICE_NAME)", var.service_name),
   )
 
   depends_on = [
