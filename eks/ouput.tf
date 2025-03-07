@@ -37,3 +37,7 @@ output "oidc_provider_arn" {
 output "app_nodegroup_name" {
   value = module.eks_managed_node_group_app.node_group_id
 }
+
+output "fargate_profile_role_name" {
+  value = aws_iam_role.fargate_profile_role.name
+}

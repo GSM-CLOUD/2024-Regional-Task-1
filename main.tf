@@ -133,6 +133,11 @@ module "resources" {
   secrets_manager_arn = module.secrets_manager.secrets_manager_arn
   service_name = var.service_name
   alb_name = var.alb_name
+  cluster_name = module.eks.cluster_name
+  fluent_bit_ns = var.fluent_bit_ns
+  user_log_group_name = var.user_log_group_name
+  fluent_bit_fargate_ns = var.fluent_bit_fargate_ns
+  fargate_profile_role_name = module.eks.fargate_profile_role_name
 
   depends_on = [ module.lb_controller ]
 }

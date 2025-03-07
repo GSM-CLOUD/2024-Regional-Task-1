@@ -33,3 +33,13 @@ variable "secrets_manager_arn" {}
 variable "service_name" {}
 
 variable "alb_name" {}
+
+variable "cluster_name" {}
+
+variable "fluent_bit_ns" {}
+
+variable "user_log_group_name" {}
+
+variable "fluent_bit_fargate_ns" {}
+
+variable "fargate_profile_role_name" {}
