@@ -35,3 +35,15 @@ variable "service_name" {
 variable "alb_name" {
   default = "skills-user-alb"
 }
+
+variable "fluent_bit_ns" {
+  default = "amazon-cloudwatch"
+}
+
+variable "user_log_group_name" {
+  default = "/aws/app/user"
+}
+
+variable "fluent_bit_fargate_ns" {
+  default = "aws-observability"
+}
